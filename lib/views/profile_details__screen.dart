@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-import './editdetails _screen.dart';
+import 'edit_details_screen.dart';
 
 class ProfileDetailsView extends StatefulWidget {
   ProfileDetailsView({super.key});

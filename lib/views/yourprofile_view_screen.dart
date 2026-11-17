@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
+import '../views/saved_address _view_screen.dart';
 
 import '../viewmodels/yourprofile_view_model.dart';
 import './profile_details__screen.dart';
@@ -45,7 +46,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         break;
 
       case 'Saved Addresses':
-        page = PlaceholderScreen('Saved Addresses');
+        page =SavedAddressView();
         break;
 
       case 'My Wallet':
