@@ -1,156 +1,162 @@
-
 import 'package:flutter/material.dart';
-import 'edit_details_screen.dart';
+import 'package:flutter_project11/viewmodels/profile_details_viewmodel.dart';
+import 'package:flutter_project11/views/edit_details_screen.dart';
 
-class ProfileDetailsView extends StatefulWidget {
-  ProfileDetailsView({super.key});
+
+class ProfileDetailsViewScreen extends StatefulWidget {
+  const ProfileDetailsViewScreen({super.key});
 
   @override
-  State<ProfileDetailsView> createState() =>
-      _ProfileDetailsViewState();
+  State<ProfileDetailsViewScreen> createState() =>
+      _ProfileDetailsViewScreenState();
 }
 
-class _ProfileDetailsViewState extends State<ProfileDetailsView> {
-  final Color primaryColor = Color(0xFF009640);
+class _ProfileDetailsViewScreenState extends State<ProfileDetailsViewScreen> {
+  final ProfileDetailsViewModel viewModel = ProfileDetailsViewModel();
 
-  String name = 'Arjun';
-  String mobile = '999088721';
-  String emergency = '6301234567';
-  String gender = 'Male';
-  String nationality = 'India';
-  String email = 'arjunarvan@123';
+  static const Color primary = Color(0xFF009640);
+  static const Color titleColor = Color(0xFF111827);
+  static const String font = 'Inter';
 
-  Future<void> openEditScreen() async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EditDetailsView(),
-      ),
-    );
-
-    if (result != null && result is Map<String, String>) {
-      setState(() {
-        name = result['name']!;
-        mobile = result['mobile']!;
-        emergency = result['emergency']!;
-        gender = result['gender']!;
-        nationality = result['nationality']!;
-        email = result['email']!;
-      });
-    }
+  @override
+  void dispose() {
+    viewModel.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: Text(
-          'Profile Details',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: Icon(Icons.arrow_back, color: Colors.black),
-        ),
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 12,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.grey.shade300),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.10),
-                    blurRadius: 8,
-                    spreadRadius: 1,
-                  ),
-                ],
-              ),
+      body: SafeArea(
+        child: ListenableBuilder(
+          listenable: viewModel,
+          builder: (context, _) {
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  profileRow('Full name', name),
-                  profileRow('Mobile Number', mobile),
-                  profileRow('Emergency Number', emergency),
-                  profileRow('Gender', gender),
-                  profileRow('Nationality', nationality),
-                  profileRow('Email Address', email),
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => viewModel.goBack(context),
+                        child: Container(
+                          width: 32,
+                          height: 32,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFF1F5F4),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.chevron_left,
+                              size: 22, color: titleColor),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        viewModel.title,
+                        style: const TextStyle(
+                          fontFamily: font,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: titleColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: const Color(0xFFEBEDEF)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.03),
+                          blurRadius: 3,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        for (int i = 0; i < viewModel.details.length; i++)
+                          Container(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: i == viewModel.details.length - 1
+                                      ? Colors.transparent
+                                      : const Color(0xFFF1F2F3),
+                                ),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  viewModel.details[i][0],
+                                  style: const TextStyle(
+                                    fontFamily: font,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: titleColor,
+                                  ),
+                                ),
+                                Text(
+                                  viewModel.details[i][1],
+                                  style: const TextStyle(
+                                    fontFamily: font,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                    color: Color(0xFF6B7280),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 44,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const EditDetailsViewScreen(),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primary,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                      child: const Text(
+                        'Edit Details',
+                        style: TextStyle(
+                          fontFamily: font,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
-            ),
-            SizedBox(height: 28),
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton(
-                onPressed: openEditScreen,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: Text(
-                  'Edit Details',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ],
+            );
+          },
         ),
-      ),
-    );
-  }
-
-  Widget profileRow(String title, String value) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 14),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: Colors.grey.shade100),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.black,
-            ),
-          ),
-          Flexible(
-            child: Text(
-              value,
-              textAlign: TextAlign.end,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey.shade700,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

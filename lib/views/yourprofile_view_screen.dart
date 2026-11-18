@@ -3,11 +3,16 @@ import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_project11/views/help_center_screen.dart';
+import 'package:flutter_project11/views/help_support_screen.dart';
+import 'package:flutter_project11/views/privacy_view_screen.dart';
+import 'package:flutter_project11/views/refer_view_screen.dart';
+import 'package:flutter_project11/views/ride_history_view_screen.dart';
+import 'package:flutter_project11/views/terms_view_screen.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
-import '../views/saved_address _view_screen.dart';
-
+import '../views/saved_address_view_screen.dart';
 import '../viewmodels/yourprofile_view_model.dart';
 import './profile_details__screen.dart';
 
@@ -16,7 +21,7 @@ final black = Color(0xFF111111);
 final lineColor = Color(0xFFE8E8E8);
 
 class ProfileScreen extends StatefulWidget {
-  ProfileScreen({super.key});
+  const ProfileScreen({super.key});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -42,39 +47,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     switch (title) {
       case 'Profile Details':
-        page = ProfileDetailsView();
+        page = ProfileDetailsViewScreen();
         break;
 
       case 'Saved Addresses':
-        page =SavedAddressView();
-        break;
-
-      case 'My Wallet':
-        page = PlaceholderScreen('My Wallet');
+        page =SavedAddressesViewScreen();
         break;
 
       case 'Ride History':
-        page = PlaceholderScreen('Ride History');
+        page = RideHistoryViewScreen();
         break;
 
       case 'Refer & Earn':
-        page = PlaceholderScreen('Refer & Earn');
+        page =  ReferAndEarnViewScreen();
         break;
 
       case 'Help Center':
-        page = PlaceholderScreen('Help Center');
+        page = HelpCenterViewScreen();
         break;
 
       case 'Terms & Conditions':
-        page = PlaceholderScreen('Terms & Conditions');
+        page = TermsAndConditionsViewScreen();
         break;
 
       case 'Privacy policy':
-        page = PlaceholderScreen('Privacy policy');
+        page =PrivacyPolicyViewScreen();
         break;
 
       case 'Help & Support':
-        page = PlaceholderScreen('Help & Support');
+        page = HelpSupportViewScreen();
         break;
 
       default:
@@ -492,9 +493,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       SizedBox(width: 10),
                       GestureDetector(
-                        onTap: () => Share.share(
-                          'Join Snapp Ride with my code ${vm.referralCode}',
-                        ),
+                        onTap: () {
+                          SharePlus.instance.share(
+                            ShareParams(
+                              text:
+                                  'Join Snapp Ride with my code ${vm.referralCode}',
+                            ),
+                          );
+                        },
                         child: Icon(
                           Icons.share_outlined,
                           size: 15,
@@ -563,7 +569,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 }
 
 class _WebCameraDialog extends StatefulWidget {
-  _WebCameraDialog();
+       const _WebCameraDialog();
 
   @override
   State<_WebCameraDialog> createState() => _WebCameraDialogState();
@@ -726,16 +732,3 @@ class _WebCameraDialogState extends State<_WebCameraDialog> {
   }
 }
 
-class PlaceholderScreen extends StatelessWidget {
-  final String title;
-
-  PlaceholderScreen(this.title, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(title)),
-      body: Center(child: Text(title)),
-    );
-  }
-}

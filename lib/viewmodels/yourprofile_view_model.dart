@@ -17,11 +17,9 @@ class ProfileViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void logout() {
-    // TODO: clear session
+  void logout(){
   }
 
   void deleteAccount() {
-    // TODO: call delete API
   }
 }
