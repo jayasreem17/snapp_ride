@@ -10,7 +10,7 @@ final _line = Color(0xFFE8E8E8);
 final _blueBox = Color(0xFFEAF4FA);
 
 class TransactionHistoryScreen extends StatelessWidget {
-  TransactionHistoryScreen({super.key});
+  const TransactionHistoryScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

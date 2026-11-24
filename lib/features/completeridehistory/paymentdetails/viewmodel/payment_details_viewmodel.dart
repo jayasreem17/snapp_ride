@@ -1,15 +1,21 @@
+
 import 'package:flutter/material.dart';
 
-class PaymentDetailsViewModel {
+class PaymentDetailsViewModel extends ChangeNotifier {
   final Map<String, dynamic> ride;
 
   PaymentDetailsViewModel(this.ride);
 
   bool get isCancelled => ride['status'] == 'Cancelled';
-  int get amount => ride['amount'];
-  String get date => ride['date'];
-  String get time => ride['time'];
+
+  int get amount => (ride['amount'] as num?)?.toInt() ?? 0;
+
+  String get date => ride['date']?.toString() ?? '';
+
+  String get time => ride['time']?.toString() ?? '';
+
   int get completedDistance => amount - 50;
+
   int get cancelledDistance => amount - 40;
 
   void downloadInvoice(BuildContext context) {
@@ -23,7 +29,9 @@ class PaymentDetailsViewModel {
 
   void openHelp(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Opening Help & Support')),
+      const SnackBar(
+        content: Text('Opening Help & Support'),
+      ),
     );
   }
 }

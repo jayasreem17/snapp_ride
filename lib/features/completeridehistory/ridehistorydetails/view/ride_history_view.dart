@@ -1,38 +1,79 @@
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_project11/features/completeridehistory/ridehistorydetails/viewmodel/ride_history_viewmodel.dart';
 
-const Color _green = Color(0xFF009640);
+Color _green = Color(0xFF009640);
 
-class RideHistoryView extends StatefulWidget {
-  const RideHistoryView({super.key});
+class RideHistoryView extends StatelessWidget {
+  RideHistoryView({super.key});
 
-  @override
-  State<RideHistoryView> createState() => _RideHistoryViewState();
-}
-
-class _RideHistoryViewState extends State<RideHistoryView> {
-  RideHistoryViewModel vm = RideHistoryViewModel();
-
-  @override
-  void dispose() {
-    vm.dispose();
-    super.dispose();
+  Widget dropdown(
+    String label,
+    String? value,
+    List<String> items,
+    Function(String?) onChanged,
+  ) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+          ),
+          SizedBox(height: 8),
+          Container(
+            height: 40,
+            padding: EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: Color(0xFFFAFAFA),
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: Color(0xFFE3E3E3)),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: value,
+                isExpanded: true,
+                dropdownColor: Colors.white,
+                hint: Text(
+                  'Select',
+                  style: TextStyle(fontSize: 11, color: Colors.grey),
+                ),
+                style: TextStyle(fontSize: 11, color: Colors.black),
+                items: items.map((e) {
+                  return DropdownMenuItem<String>(
+                    value: e,
+                    child: Text(e),
+                  );
+                }).toList(),
+                onChanged: onChanged,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: vm,
-      builder: (context, child) {
-        if (vm.showFilter) {
-          return filterPage();
-        }
-        return historyPage();
-      },
+    return ChangeNotifierProvider(
+      create: (_) => RideHistoryViewModel(),
+      child: Consumer<RideHistoryViewModel>(
+        builder: (context, vm, child) {
+          if (vm.showFilter) {
+            return filterPage(context, vm);
+          }
+
+          return historyPage(context, vm);
+        },
+      ),
     );
   }
 
-  Widget historyPage() {
+  Widget historyPage(BuildContext context, RideHistoryViewModel vm) {
     List<Map<String, dynamic>> rides = vm.filteredRides;
 
     return Scaffold(
@@ -41,64 +82,77 @@ class _RideHistoryViewState extends State<RideHistoryView> {
         elevation: 0,
         scrolledUnderElevation: 0,
         titleSpacing: 0,
-                 leading: Padding(
-          padding: const EdgeInsets.all(12),
+        leading: Padding(
+          padding: EdgeInsets.all(12),
           child: InkWell(
             onTap: () => Navigator.pop(context),
             child: Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                          color: const Color.fromARGB(255, 249, 247, 247),
-
+                color: Color.fromARGB(255, 249, 247, 247),
               ),
-              child: const Icon(Icons.chevron_left, size: 20, color: Colors.black),
+              child: Icon(
+                Icons.chevron_left,
+                size: 20,
+                color: Colors.black,
+              ),
             ),
           ),
         ),
-        title: const Text(
+        title: Text(
           'Ride History',
-          style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: Colors.black),
+          style: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
         ),
       ),
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
+            padding: EdgeInsets.fromLTRB(16, 8, 16, 14),
             child: Row(
               children: [
                 Expanded(
                   child: Container(
                     height: 40,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    padding: EdgeInsets.symmetric(horizontal: 12),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: Colors.black),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.search, size: 18),
-                        const SizedBox(width: 8),
+                        Icon(Icons.search, size: 18),
+                        SizedBox(width: 8),
                         Expanded(
                           child: TextField(
                             controller: vm.searchController,
-                            style: const TextStyle(fontSize: 12),
-                            decoration: const InputDecoration(
+                            style: TextStyle(fontSize: 12),
+                            decoration: InputDecoration(
                               isDense: true,
                               border: InputBorder.none,
                               hintText: 'Search Location, date',
-                              hintStyle: TextStyle(fontSize: 12, color: Colors.grey),
+                              hintStyle: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
                             ),
                           ),
                         ),
                         InkWell(
                           onTap: () => vm.pickDate(context),
-                          child: const Icon(Icons.calendar_month_outlined, size: 18),
+                          child: Icon(
+                            Icons.calendar_month_outlined,
+                            size: 18,
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12),
                 InkWell(
                   onTap: vm.openFilter,
                   child: Icon(
@@ -112,16 +166,19 @@ class _RideHistoryViewState extends State<RideHistoryView> {
           ),
           Container(
             decoration: BoxDecoration(
-              border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
+              border: Border(
+                bottom: BorderSide(color: Colors.grey.shade300),
+              ),
             ),
             child: Row(
               children: List.generate(3, (i) {
                 bool selected = vm.selectedTab == i;
+
                 return Expanded(
                   child: InkWell(
                     onTap: () => vm.changeTab(i),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
                         border: Border(
                           bottom: BorderSide(
@@ -136,7 +193,9 @@ class _RideHistoryViewState extends State<RideHistoryView> {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: selected ? _green : Colors.grey.shade600,
+                            color: selected
+                                ? _green
+                                : Colors.grey.shade600,
                           ),
                         ),
                       ),
@@ -147,156 +206,168 @@ class _RideHistoryViewState extends State<RideHistoryView> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.fromLTRB(16, 18, 16, 20),
-              itemCount: rides.length,
-              itemBuilder: (context, index) {
-                Map<String, dynamic> r = rides[index];
-                bool cancelled = r['status'] == 'Cancelled';
-                return InkWell(
-                  onTap: () => vm.openRideDetails(context, r),
-                  child: Container(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFAFAFA),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: const Color(0xFFEDEDED)),
+            child: rides.isEmpty
+                ? Center(
+                    child: Text(
+                      'No rides found',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey.shade600,
+                      ),
                     ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Image.asset(
-                          r['image'],
-                          width: 36,
-                          height: 36,
-                          errorBuilder: (c, e, s) => Image.asset('assets/images/bike.png', width: 36, height: 36),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
+                  )
+                : ListView.builder(
+                    padding: EdgeInsets.fromLTRB(16, 18, 16, 20),
+                    itemCount: rides.length,
+                    itemBuilder: (context, index) {
+                      Map<String, dynamic> r = rides[index];
+                      bool cancelled = r['status'] == 'Cancelled';
+
+                      return InkWell(
+                        onTap: () => vm.openRideDetails(context, r),
+                        child: Container(
+                          margin: EdgeInsets.only(bottom: 8),
+                          padding: EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Color(0xFFFAFAFA),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: Color(0xFFEDEDED),
+                            ),
+                          ),
+                          child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    r['title'],
-                                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                                  ),
-                                  if (vm.selectedTab == 0) ...[
-                                    const SizedBox(width: 6),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: cancelled ? const Color(0xFFC40000) : _green,
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: Text(
-                                        r['status'],
-                                        style: const TextStyle(
-                                          fontSize: 8.5,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.white,
+                              Image.asset(
+                                r['image'],
+                                width: 36,
+                                height: 36,
+                                errorBuilder: (c, e, s) {
+                                  return Image.asset(
+                                    'assets/images/bike.png',
+                                    width: 36,
+                                    height: 36,
+                                  );
+                                },
+                              ),
+                              SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Flexible(
+                                          child: Text(
+                                            r['title'],
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
                                         ),
+                                        if (vm.selectedTab == 0) ...[
+                                          SizedBox(width: 6),
+                                          Container(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: 6,
+                                              vertical: 2,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: cancelled
+                                                  ? Color(0xFFC40000)
+                                                  : _green,
+                                              borderRadius:
+                                                  BorderRadius.circular(4),
+                                            ),
+                                            child: Text(
+                                              r['status'],
+                                              style: TextStyle(
+                                                fontSize: 8.5,
+                                                fontWeight: FontWeight.w600,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                        SizedBox(width: 6),
+                                        Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 6,
+                                            vertical: 2,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Color(0xFFFFF1DC),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          child: Text(
+                                            '${r['points']} Points',
+                                            style: TextStyle(
+                                              fontSize: 8.5,
+                                              fontWeight: FontWeight.w600,
+                                              color: Color(0xFFF08A00),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 5),
+                                    Text(
+                                      'From : Madhapur → To : KPHB',
+                                      style: TextStyle(
+                                        fontSize: 10.5,
+                                        color: Colors.grey.shade600,
                                       ),
+                                    ),
+                                    SizedBox(height: 3),
+                                    Text(
+                                      '${r['date']}, ${r['time']}',
+                                      style: TextStyle(fontSize: 10.5),
                                     ),
                                   ],
-                                  const SizedBox(width: 6),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFFFF1DC),
-                                      borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    '₹${r['amount']}',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
                                     ),
-                                    child: Text(
-                                      '${r['points']} Points',
-                                      style: const TextStyle(
-                                        fontSize: 8.5,
-                                        fontWeight: FontWeight.w600,
-                                        color: Color(0xFFF08A00),
-                                      ),
+                                  ),
+                                  SizedBox(height: 14),
+                                  Container(
+                                    width: 14,
+                                    height: 14,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Color(0xFFDDF3E5),
+                                    ),
+                                    child: Icon(
+                                      Icons.arrow_forward,
+                                      size: 8,
+                                      color: _green,
                                     ),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 5),
-                              Text(
-                                'From : Madhapur → To : KPHB',
-                                style: TextStyle(fontSize: 10.5, color: Colors.grey.shade600),
-                              ),
-                              const SizedBox(height: 3),
-                              Text(
-                                '${r['date']}, ${r['time']}',
-                                style: const TextStyle(fontSize: 10.5),
-                              ),
                             ],
                           ),
                         ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              '₹${r['amount']}',
-                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
-                            ),
-                            const SizedBox(height: 14),
-                            Container(
-                              width: 14,
-                              height: 14,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Color(0xFFDDF3E5),
-                              ),
-                              child: const Icon(Icons.arrow_forward, size: 8, color: _green),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
           ),
         ],
       ),
     );
   }
 
-  Widget dropdown(String label, String? value, List<String> items, Function(String?) onChanged) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 8),
-          Container(
-            height: 40,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFAFAFA),
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: const Color(0xFFE3E3E3)),
-            ),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                value: value,
-                isExpanded: true,
-                dropdownColor: Colors.white,
-                hint: const Text('Select', style: TextStyle(fontSize: 11, color: Colors.grey)),
-                style: const TextStyle(fontSize: 11, color: Colors.black),
-                items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                onChanged: (v) => onChanged(v),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget filterPage() {
+  Widget filterPage(BuildContext context, RideHistoryViewModel vm) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -306,23 +377,27 @@ class _RideHistoryViewState extends State<RideHistoryView> {
         titleSpacing: 0,
         leading: IconButton(
           onPressed: vm.closeFilter,
-          icon: const Icon(Icons.arrow_back_ios_new_outlined, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new_outlined, size: 20),
         ),
-        title: const Text(
+        title: Text(
           'Filter',
-          style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: Colors.black),
+          style: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
         ),
       ),
       body: Column(
         children: [
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               child: Container(
-                padding: const EdgeInsets.fromLTRB(14, 14, 14, 0),
+                padding: EdgeInsets.fromLTRB(14, 14, 14, 0),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFFE3E3E3)),
+                  border: Border.all(color: Color(0xFFE3E3E3)),
                 ),
                 child: Column(
                   children: [
@@ -335,25 +410,40 @@ class _RideHistoryViewState extends State<RideHistoryView> {
                       vm.update();
                     }),
                     if (vm.selectedTab == 0)
-                      dropdown('Ride Status', vm.rideStatus, vm.rideStatuses, (v) {
-                        vm.rideStatus = v;
+                      dropdown(
+                        'Ride Status',
+                        vm.rideStatus,
+                        vm.rideStatuses,
+                        (v) {
+                          vm.rideStatus = v;
+                          vm.update();
+                        },
+                      ),
+                    dropdown(
+                      'Payment Status',
+                      vm.paymentStatus,
+                      vm.paymentStatuses,
+                      (v) {
+                        vm.paymentStatus = v;
                         vm.update();
-                      }),
-                    dropdown('Payment Status', vm.paymentStatus, vm.paymentStatuses, (v) {
-                      vm.paymentStatus = v;
-                      vm.update();
-                    }),
-                    dropdown('Payment Method', vm.paymentMethod, vm.paymentMethods, (v) {
-                      vm.paymentMethod = v;
-                      vm.update();
-                    }),
+                      },
+                    ),
+                    dropdown(
+                      'Payment Method',
+                      vm.paymentMethod,
+                      vm.paymentMethods,
+                      (v) {
+                        vm.paymentMethod = v;
+                        vm.update();
+                      },
+                    ),
                   ],
                 ),
               ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+            padding: EdgeInsets.fromLTRB(16, 4, 16, 24),
             child: Row(
               children: [
                 Expanded(
@@ -362,17 +452,23 @@ class _RideHistoryViewState extends State<RideHistoryView> {
                     child: OutlinedButton(
                       onPressed: vm.resetFilter,
                       style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: _green),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                        side: BorderSide(color: _green),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Reset',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: _green),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: _green,
+                        ),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 Expanded(
                   child: SizedBox(
                     height: 44,
@@ -381,11 +477,17 @@ class _RideHistoryViewState extends State<RideHistoryView> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _green,
                         elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Apply Filters',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
