@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_project11/features/yourprofiledetails/helpcenter/view/help_center_screen.dart';
 import 'package:flutter_project11/features/yourprofiledetails/helpsupport/view/help_support_screen.dart';
+import 'package:flutter_project11/features/MyWallet/yourwallet/view/your_wallet_view.dart';
 import 'package:flutter_project11/features/yourprofiledetails/privacydetails/view/privacy_view_screen.dart';
 import 'package:flutter_project11/features/yourprofiledetails/referandearn/view/refer_view_screen.dart';
 import 'package:flutter_project11/features/completeridehistory/ridehistorydetails/view/ride_history_view.dart';
@@ -63,6 +64,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       case 'Transaction History':
         page = TransactionHistoryScreen();
         break;
+       case 'My Wallet':
+  page = YourWalletView();
+  break;
       case 'Refer & Earn':
         page = ReferAndEarnViewScreen();
         break;

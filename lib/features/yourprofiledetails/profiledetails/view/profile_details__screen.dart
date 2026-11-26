@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_project11/features/editdetailsbloc/view/edit_details_bloc_view.dart';
 import 'package:flutter_project11/features/yourprofiledetails/profiledetails/viewmodel/profile_details_viewmodel.dart';
-import 'package:flutter_project11/features/yourprofiledetails/editdetails/view/edit_details_screen.dart';
 
 
 class ProfileDetailsViewScreen extends StatefulWidget {
@@ -130,7 +130,7 @@ class _ProfileDetailsViewScreenState extends State<ProfileDetailsViewScreen> {
                       onPressed: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (_) => const EditDetailsViewScreen(),
+                            builder: (_) =>  EditDetailsView(),
                           ),
                         );
                       },
