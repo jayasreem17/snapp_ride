@@ -72,7 +72,7 @@ class PaymentMethodViewModel extends ChangeNotifier {
     final text = cardController.text.trim();
 
     if (text.isEmpty) return 'Please enter Card Number';
-    if (text.length != 16) return 'Card Number must be 16 digits';
+    if (text.length != 12) return 'Card Number must be 16 digits';
 
     return null;
   }

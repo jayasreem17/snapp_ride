@@ -64,7 +64,8 @@ class AddMoneyView extends StatelessWidget {
                               controller: vm.amountController,
                               onChanged: vm.onAmountChanged,
                               keyboardType: TextInputType.number,
-                              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                              inputFormatters: [FilteringTextInputFormatter.digitsOnly,  LengthLimitingTextInputFormatter(7),
+],
                               style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF111827)),
                               decoration: const InputDecoration(
                                 isDense: true,

@@ -8,10 +8,29 @@ class WalletViewModel extends ChangeNotifier {
   int referrals = 4;
   int points = 20;
   int selectedTab = 0;
-  String filterType = 'All';
   String? selectedDate;
 
   final searchController = TextEditingController();
+
+  final filterPaymentModes = [
+    'All Credited',
+    'All Debited',
+    'Refunds',
+    'Referrals',
+    'Ride Points',
+    'Add Money',
+  ];
+  final filterYears = ['2026', '2027'];
+  final filterMonths = ['November', 'December'];
+
+  String? filterPaymentMode;
+  String? filterYear;
+  String? filterMonth;
+
+  String? draftPaymentMode;
+  String? draftYear;
+  String? draftMonth;
+  String openDropdown = '';
 
   final earnings = [
     {'icon': Icons.account_balance_wallet_outlined, 'title': 'Pending Payment Refund', 'amount': '+₹120', 'type': 'Razor Pay', 'badge': '', 'date': '12 Oct 2026  |  12:00 PM'},
@@ -25,8 +44,13 @@ class WalletViewModel extends ChangeNotifier {
   ];
 
   final pendingRefunds = [
-    {'icon': Icons.account_balance_wallet_outlined, 'title': 'Pending Payment Refund', 'amount': '+₹120', 'type': 'Razor Pay', 'badge': '', 'date': '12 Oct 2026  |  12:00 PM'},
+    {'icon': Icons.account_balance_wallet_outlined, 'title': 'Pending Payment Refund', 'amount': '₹80', 'type': 'Razor Pay', 'badge': '', 'status': 'Pending', 'detailsKey': 'Pending: Pending Payment Refund', 'date': '12 Oct 2026  |  12:00 PM'},
+    {'icon': Icons.account_balance_wallet_outlined, 'title': 'Ride Refund Money', 'amount': '₹15', 'type': 'Razor Pay', 'badge': '', 'status': 'Pending', 'detailsKey': 'Pending: Ride Refund Money', 'date': '12 Oct 2026  |  12:00 PM'},
   ];
+
+  bool get hasFilter {
+    return filterPaymentMode != null || filterYear != null || filterMonth != null;
+  }
 
   List get transactions {
     var list = selectedTab == 0 ? earnings : pendingRefunds;
@@ -40,15 +64,46 @@ class WalletViewModel extends ChangeNotifier {
       list = list.where((e) => e['date'].toString().contains(selectedDate!)).toList();
     }
 
-    if (filterType == 'Credited') {
-      list = list.where((e) => e['amount'].toString().startsWith('+')).toList();
+    if (filterPaymentMode != null) {
+      list = list.where(matchesPaymentMode).toList();
     }
 
-    if (filterType == 'Debited') {
-      list = list.where((e) => e['amount'].toString().startsWith('-')).toList();
+    if (filterYear != null) {
+      list = list.where((e) => e['date'].toString().contains(filterYear!)).toList();
+    }
+
+    if (filterMonth != null) {
+      list = list.where(matchesMonth).toList();
     }
 
     return list;
+  }
+
+  bool matchesPaymentMode(Map item) {
+    final title = item['title'].toString();
+    final amount = item['amount'].toString();
+
+    switch (filterPaymentMode) {
+      case 'All Credited':
+        return amount.startsWith('+');
+      case 'All Debited':
+        return amount.startsWith('-');
+      case 'Refunds':
+        return title.contains('Refund');
+      case 'Referrals':
+        return title.contains('Referral');
+      case 'Ride Points':
+        return title.contains('Ride Points');
+      case 'Add Money':
+        return title == 'Add Money';
+      default:
+        return true;
+    }
+  }
+
+  bool matchesMonth(Map item) {
+    final shortMonth = filterMonth!.substring(0, 3);
+    return item['date'].toString().contains(' $shortMonth ');
   }
 
   void changeTab(int index) {
@@ -80,26 +135,50 @@ class WalletViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void openFilter(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: ['All', 'Credited', 'Debited'].map((type) {
-            return ListTile(
-              title: Text(type),
-              trailing: filterType == type ? const Icon(Icons.check, color: Color(0xff009640)) : null,
-              onTap: () {
-                filterType = type;
-                notifyListeners();
-                Navigator.pop(context);
-              },
-            );
-          }).toList(),
-        );
-      },
-    );
+  void loadDraft() {
+    draftPaymentMode = filterPaymentMode;
+    draftYear = filterYear;
+    draftMonth = filterMonth;
+    openDropdown = '';
+  }
+
+  void toggleDropdown(String name) {
+    openDropdown = openDropdown == name ? '' : name;
+    notifyListeners();
+  }
+
+  void selectPaymentMode(String value) {
+    draftPaymentMode = value;
+    openDropdown = '';
+    notifyListeners();
+  }
+
+  void selectYear(String value) {
+    draftYear = value;
+    openDropdown = '';
+    notifyListeners();
+  }
+
+  void selectMonth(String value) {
+    draftMonth = value;
+    openDropdown = '';
+    notifyListeners();
+  }
+
+  void resetFilter() {
+    draftPaymentMode = null;
+    draftYear = null;
+    draftMonth = null;
+    openDropdown = '';
+    notifyListeners();
+  }
+
+  void applyFilter(BuildContext context) {
+    filterPaymentMode = draftPaymentMode;
+    filterYear = draftYear;
+    filterMonth = draftMonth;
+    Navigator.pop(context);
+    notifyListeners();
   }
 
   void addMoney() {}

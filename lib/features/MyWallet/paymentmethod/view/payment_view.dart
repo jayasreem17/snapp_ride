@@ -133,7 +133,7 @@ class PaymentMethodView extends StatelessWidget {
             controller: vm.cardController,
             error: vm.cardError,
             onChanged: vm.onCardChanged,
-            formatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(16)],
+            formatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(12)],
           ),
           inputField(
             label: 'Expiry Date*',
@@ -142,7 +142,7 @@ class PaymentMethodView extends StatelessWidget {
             error: vm.expiryError,
             onChanged: vm.onExpiryChanged,
             formatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9/]')), LengthLimitingTextInputFormatter(7)],
-          ),
+          ),                                                       
           inputField(
             label: 'CVV*',
             hint: 'XXX',

@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
@@ -16,6 +15,7 @@ import 'package:flutter_project11/features/yourprofiledetails/transactionhistory
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../saveddetails/view/saved_address_view_screen.dart';
 import '../viewmodel/yourprofile_view_model.dart';
@@ -64,9 +64,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       case 'Transaction History':
         page = TransactionHistoryScreen();
         break;
-       case 'My Wallet':
-  page = YourWalletView();
-  break;
+      case 'My Wallet':
+        page = YourWalletView();
+        break;
       case 'Refer & Earn':
         page = ReferAndEarnViewScreen();
         break;
@@ -546,9 +546,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         titleSpacing: 16,
         title: Text(
           'Your Profile',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
+          style: GoogleFonts.inter(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
             color: Color(0xFF111827),
           ),
         ),
